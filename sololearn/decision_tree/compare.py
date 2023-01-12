@@ -1,15 +1,16 @@
-import pandas as pd
+import polars as pl
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 from sklearn.metrics import precision_score, recall_score
 import numpy as np
+from sklearn.utils import column_or_1d
 
-df = pd.read_csv('./titanic.csv')
-df['male'] = df['Sex'] == 'male'
+df = pl.read_csv('./titanic.csv')
+df = df.with_column((pl.col('Sex') == 'male').alias('male'))
 X = df[['Pclass', 'male', 'Age', 'Siblings/Spouses',
-        'Parents/Children', 'Fare']].values
-y = df['Survived'].values
+        'Parents/Children', 'Fare']].to_numpy()
+y = column_or_1d(df['Survived'].to_numpy())
 
 kf = KFold(n_splits=5, shuffle=True, random_state=10)
 dt_accuracy_scores = []

@@ -1,12 +1,15 @@
-import pandas as pd
+import polars as pl
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.utils import column_or_1d
 
-df = pd.read_csv('./titanic.csv')
-df['male'] = df['Sex'] == 'male'
+df = pl.read_csv('./titanic.csv')
+df = df.with_columns([
+    (pl.col('Sex') == 'male').alias('male')
+])
 X = df[['Pclass', 'male', 'Age', 'Siblings/Spouses',
-        'Parents/Children', 'Fare']].values
-y = df['Survived'].values
+        'Parents/Children', 'Fare']].to_numpy()
+y = column_or_1d(df['Survived'].to_numpy())
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=22)
 model = DecisionTreeClassifier()

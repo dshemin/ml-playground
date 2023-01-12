@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
-import pandas as pd
+from sklearn.utils import column_or_1d
+import polars as pl
 from sklearn.linear_model import LogisticRegression
 
-df = pd.read_csv('https://sololearn.com/uploads/files/titanic.csv')
-df['male'] = df['Sex'] == 'male'
+df = pl.read_csv('https://sololearn.com/uploads/files/titanic.csv')
+df = df.with_columns(
+    (pl.col('Sex') == 'male').alias('male'),
+)
 
 x = df[[
     'Pclass',
@@ -13,8 +16,8 @@ x = df[[
     'Siblings/Spouses',
     'Parents/Children',
     'Fare',
-]].values
-y = df['Survived'].values
+]].to_numpy()
+y = column_or_1d(df.select(['Survived']).to_numpy())
 
 model = LogisticRegression()
 model.fit(x, y)
