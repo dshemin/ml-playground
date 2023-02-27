@@ -1,3 +1,3 @@
 # ML Playground
 
-Just some experement with ML.
+Just some experements with ML.
